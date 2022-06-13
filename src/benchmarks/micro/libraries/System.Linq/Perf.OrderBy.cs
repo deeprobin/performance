@@ -144,4 +144,33 @@ namespace System.Linq.Tests
         [Benchmark]
         public void OrderByCustomComparer() => _people.OrderBy(p => p.FavouriteColour, FavourColourComparer.Instance).Consume(_consumer);
     }
+    
+    [BenchmarkCategory(Categories.Libraries, Categories.LINQ)]
+    public class Perf_Order
+    {
+        [Params(Utils.DefaultCollectionSize)]
+        public int NumberCount;
+        
+        private int[] _numbers;
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            const int seed = 123;
+            var random = new Random(seed);
+            _numbers = new int[NumberCount];
+            for(var i = 0; i < NumberCount; i++)
+            {
+                _numbers[i] = random.Next();
+            }
+        }
+
+        private static int OrderByClause(int i) => i;
+
+        [Benchmark(Baseline = true)]
+        public int[] OrderBySelf() => _numbers.OrderBy(OrderByClause).ToArray();
+
+        [Benchmark]        
+        public int[] Order() => _numbers.Order().ToArray();
+    }
 }
